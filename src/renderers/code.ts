@@ -17,6 +17,8 @@ import type { ViewerRenderer } from '../types';
 
 const EXTENSION_LANGUAGE: Record<string, string> = {
   js: 'javascript',
+  mjs: 'javascript',
+  cjs: 'javascript',
   jsx: 'jsx',
   ts: 'typescript',
   tsx: 'tsx',
@@ -26,6 +28,8 @@ const EXTENSION_LANGUAGE: Record<string, string> = {
   html: 'markup',
   htm: 'markup',
   xml: 'markup',
+  vue: 'markup',
+  svelte: 'markup',
   py: 'python',
   sh: 'bash',
   bash: 'bash',
@@ -40,19 +44,21 @@ export const codeRenderer: ViewerRenderer = {
   render(container, { file, options, state }) {
     const language = options.code.language ?? EXTENSION_LANGUAGE[file.extension] ?? file.extension ?? 'markup';
     const grammar = Prism.languages[language] ?? Prism.languages.markup;
-    const highlighted = Prism.highlight(file.text ?? '', grammar, language);
     const pre = createElement('pre', { className: `mfv-code language-${language}` });
     const code = createElement('code', { className: `language-${language}` });
     pre.style.fontSize = `${13 * state.zoom}px`;
     pre.style.transform = `rotate(${state.rotate}deg)`;
 
     if (options.code.showLineNumbers) {
-      const lines = highlighted.split('\n');
+      const lines = (file.text ?? '').replace(/\r\n?/g, '\n').split('\n');
       code.innerHTML = lines
-        .map((line, index) => `<span class="mfv-code-line"><span class="mfv-code-no">${index + 1}</span><span class="mfv-code-text">${line || ' '}</span></span>`)
+        .map((line, index) => {
+          const highlighted = Prism.highlight(line || ' ', grammar, language);
+          return `<span class="mfv-code-line"><span class="mfv-code-no">${index + 1}</span><span class="mfv-code-text">${highlighted}</span></span>`;
+        })
         .join('');
     } else {
-      code.innerHTML = highlighted;
+      code.innerHTML = Prism.highlight(file.text ?? '', grammar, language);
     }
 
     pre.appendChild(code);

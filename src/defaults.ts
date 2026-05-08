@@ -9,6 +9,7 @@ export const defaultLocale: Required<ViewerLocale> = {
   download: 'Download',
   print: 'Print',
   fullscreen: 'Fullscreen',
+  exitFullscreen: 'Exit fullscreen',
   fitWidth: 'Fit width',
   reset: 'Reset',
   sheet: 'Sheet',
@@ -17,19 +18,20 @@ export const defaultLocale: Required<ViewerLocale> = {
 };
 
 export const zhCNLocale: Required<ViewerLocale> = {
-  loading: '正在加载预览...',
-  unsupported: '暂不支持预览该文件类型。',
-  zoomIn: '放大',
-  zoomOut: '缩小',
-  rotate: '旋转',
-  download: '下载',
-  print: '打印',
-  fullscreen: '全屏',
-  fitWidth: '适应宽度',
-  reset: '重置',
-  sheet: '工作表',
-  page: '页',
-  error: '预览失败'
+  loading: '\u6b63\u5728\u52a0\u8f7d\u9884\u89c8...',
+  unsupported: '\u6682\u4e0d\u652f\u6301\u9884\u89c8\u8be5\u6587\u4ef6\u7c7b\u578b\u3002',
+  zoomIn: '\u653e\u5927',
+  zoomOut: '\u7f29\u5c0f',
+  rotate: '\u65cb\u8f6c',
+  download: '\u4e0b\u8f7d',
+  print: '\u6253\u5370',
+  fullscreen: '\u5168\u5c4f',
+  exitFullscreen: '\u9000\u51fa\u5168\u5c4f',
+  fitWidth: '\u9002\u5e94\u5bbd\u5ea6',
+  reset: '\u91cd\u7f6e',
+  sheet: '\u5de5\u4f5c\u8868',
+  page: '\u9875',
+  error: '\u9884\u89c8\u5931\u8d25'
 };
 
 export const defaultToolbar: Required<ToolbarConfig> = {
@@ -107,6 +109,11 @@ export function resolveOptions(options: MultiFileViewerOptions = {}): RequiredVi
       includeDefaultStyleMap: options.word?.includeDefaultStyleMap ?? true
     },
     requestHeaders: options.requestHeaders ?? {},
+    requestMode: options.requestMode ?? 'cors',
+    requestCredentials: options.requestCredentials ?? (options.crossOrigin === 'use-credentials' || options.withCredentials ? 'include' : 'same-origin'),
+    requestCache: options.requestCache ?? 'default',
+    referrerPolicy: options.referrerPolicy ?? 'strict-origin-when-cross-origin',
+    crossOrigin: options.crossOrigin ?? 'anonymous',
     withCredentials: options.withCredentials ?? false,
     renderers: options.renderers ?? [],
     onReady: options.onReady,

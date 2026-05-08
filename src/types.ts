@@ -78,6 +78,7 @@ export interface ViewerLocale {
   download?: string;
   print?: string;
   fullscreen?: string;
+  exitFullscreen?: string;
   fitWidth?: string;
   reset?: string;
   sheet?: string;
@@ -107,6 +108,11 @@ export interface MultiFileViewerOptions {
   code?: CodeOptions;
   word?: WordOptions;
   requestHeaders?: HeadersInit;
+  requestMode?: RequestMode;
+  requestCredentials?: RequestCredentials;
+  requestCache?: RequestCache;
+  referrerPolicy?: ReferrerPolicy;
+  crossOrigin?: 'anonymous' | 'use-credentials';
   withCredentials?: boolean;
   renderers?: ViewerRenderer[];
   onReady?: (api: ViewerApi) => void;

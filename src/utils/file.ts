@@ -1,5 +1,14 @@
 import type { FileKind, FileSource, LoadedFile, NormalizedFile, ViewerFile } from '../types';
 
+export interface LoadFileOptions {
+  headers?: HeadersInit;
+  mode?: RequestMode;
+  credentials?: RequestCredentials;
+  cache?: RequestCache;
+  referrerPolicy?: ReferrerPolicy;
+  withCredentials?: boolean;
+}
+
 const EXTENSION_KIND_MAP: Record<string, FileKind> = {
   pdf: 'pdf',
   doc: 'word',
@@ -144,15 +153,24 @@ export function normalizeFile(input: ViewerFile | FileSource, fallback?: { filen
   };
 }
 
-export async function loadFile(normalized: NormalizedFile, headers?: HeadersInit, withCredentials?: boolean): Promise<LoadedFile> {
+export async function loadFile(normalized: NormalizedFile, options: LoadFileOptions = {}): Promise<LoadedFile> {
   if (typeof normalized.source === 'string') {
-    const response = await fetch(normalized.source, {
-      headers,
-      credentials: withCredentials ? 'include' : 'same-origin'
-    });
+    let response: Response;
+    try {
+      response = await fetch(normalized.source, {
+        headers: options.headers,
+        mode: options.mode,
+        credentials: options.credentials ?? (options.withCredentials ? 'include' : 'same-origin'),
+        cache: options.cache,
+        referrerPolicy: options.referrerPolicy
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to load remote file "${normalized.source}". ${message}. If this is a cross-origin URL, ensure the server allows CORS and configure requestMode/requestCredentials as needed.`);
+    }
 
     if (!response.ok) {
-      throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to load remote file "${normalized.source}": ${response.status} ${response.statusText}`);
     }
 
     const blob = await response.blob();

@@ -45,16 +45,20 @@ export function formatSize(value?: string | number): string | undefined {
   return typeof value === 'number' ? `${value}px` : value;
 }
 
-export function makeButton(label: string, title: string, className = 'mfv-toolbar-button'): HTMLButtonElement {
+export function makeButton(label: string, title: string, className = 'mfv-toolbar-button', html = false): HTMLButtonElement {
   const button = createElement('button', {
     className,
-    text: label,
     attrs: {
       type: 'button',
       title,
       'aria-label': title
     }
   });
+  if (html) {
+    button.innerHTML = label;
+  } else {
+    button.textContent = label;
+  }
   return button;
 }
 

@@ -13,6 +13,7 @@ import type {
 } from '../types';
 import { clearElement, createElement, formatSize, makeButton, setStyles } from '../utils/dom';
 import { downloadUrl, loadFile, normalizeFile, releaseLoadedFile } from '../utils/file';
+import { renderIcon, type IconName } from '../utils/icons';
 
 const ROOT_CLASS = 'mfv-root';
 
@@ -44,6 +45,7 @@ export class MultiFileViewer {
     this.viewport.appendChild(this.content);
     this.root.append(this.toolbar, this.viewport);
     element.appendChild(this.root);
+    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 
     this.state = {
       kind: this.options.type ?? 'unknown',
@@ -120,6 +122,7 @@ export class MultiFileViewer {
     this.destroyed = true;
     this.renderer?.destroy?.();
     releaseLoadedFile(this.file);
+    document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
     this.root.remove();
   }
 
@@ -171,7 +174,14 @@ export class MultiFileViewer {
 
     try {
       const normalized = normalizeFile(input, fallback);
-      const loadedFile = await loadFile(normalized, this.options.requestHeaders, this.options.withCredentials);
+      const loadedFile = await loadFile(normalized, {
+        headers: this.options.requestHeaders,
+        mode: this.options.requestMode,
+        credentials: this.options.requestCredentials,
+        cache: this.options.requestCache,
+        referrerPolicy: this.options.referrerPolicy,
+        withCredentials: this.options.withCredentials
+      });
       if (this.destroyed || token !== this.renderToken) {
         releaseLoadedFile(loadedFile);
         return;
@@ -248,34 +258,36 @@ export class MultiFileViewer {
     left.appendChild(filename);
 
     if (toolbar.zoom) {
-      right.appendChild(this.bindButton('-', this.options.locale.zoomOut, () => this.api.zoomOut()));
+      right.appendChild(this.bindButton('zoomOut', this.options.locale.zoomOut, () => this.api.zoomOut()));
       right.appendChild(createElement('span', { className: 'mfv-zoom-value', text: `${Math.round(this.state.zoom * 100)}%` }));
-      right.appendChild(this.bindButton('+', this.options.locale.zoomIn, () => this.api.zoomIn()));
+      right.appendChild(this.bindButton('zoomIn', this.options.locale.zoomIn, () => this.api.zoomIn()));
     }
     if (toolbar.fitWidth) {
-      right.appendChild(this.bindButton('Fit', this.options.locale.fitWidth, () => this.api.fitWidth()));
+      right.appendChild(this.bindButton('fitWidth', this.options.locale.fitWidth, () => this.api.fitWidth()));
     }
     if (toolbar.rotate) {
-      right.appendChild(this.bindButton('Rotate', this.options.locale.rotate, () => this.api.rotate()));
+      right.appendChild(this.bindButton('rotate', this.options.locale.rotate, () => this.api.rotate()));
     }
     if (toolbar.reset) {
-      right.appendChild(this.bindButton('Reset', this.options.locale.reset, () => this.api.reset()));
+      right.appendChild(this.bindButton('reset', this.options.locale.reset, () => this.api.reset()));
     }
     if (toolbar.print && this.options.printable) {
-      right.appendChild(this.bindButton('Print', this.options.locale.print, () => this.api.print()));
+      right.appendChild(this.bindButton('print', this.options.locale.print, () => this.api.print()));
     }
     if (toolbar.download && this.options.downloadable) {
-      right.appendChild(this.bindButton('Download', this.options.locale.download, () => void this.api.download()));
+      right.appendChild(this.bindButton('download', this.options.locale.download, () => void this.api.download()));
     }
     if (toolbar.fullscreen) {
-      right.appendChild(this.bindButton('Full', this.options.locale.fullscreen, () => void this.api.fullscreen()));
+      const icon = this.state.fullscreen ? 'exitFullscreen' : 'fullscreen';
+      const label = this.state.fullscreen ? this.options.locale.exitFullscreen : this.options.locale.fullscreen;
+      right.appendChild(this.bindButton(icon, label, () => void this.api.fullscreen()));
     }
 
     this.toolbar.append(left, right);
   }
 
-  private bindButton(label: string, title: string, handler: () => void): HTMLButtonElement {
-    const button = makeButton(label, title);
+  private bindButton(icon: IconName, title: string, handler: () => void): HTMLButtonElement {
+    const button = makeButton(renderIcon(icon), title, 'mfv-toolbar-button mfv-icon-button', true);
     button.addEventListener('click', handler);
     return button;
   }
@@ -290,10 +302,15 @@ export class MultiFileViewer {
   private renderError(error: Error): void {
     clearElement(this.content);
     const wrapper = createElement('div', { className: 'mfv-empty' });
+    const detail = createElement('pre', {
+      className: 'mfv-error-detail',
+      text: error.stack || `${error.name}: ${error.message}`
+    });
     wrapper.append(
       createElement('div', { className: 'mfv-empty-badge', text: '!' }),
       createElement('div', { className: 'mfv-empty-title', text: this.options.locale.error }),
-      createElement('div', { className: 'mfv-empty-message', text: error.message })
+      createElement('div', { className: 'mfv-empty-message', text: error.message }),
+      detail
     );
     this.content.appendChild(wrapper);
     this.renderToolbar();
@@ -341,18 +358,22 @@ export class MultiFileViewer {
   }
 
   private async setFullscreen(enabled?: boolean): Promise<void> {
-    const shouldEnter = enabled ?? !document.fullscreenElement;
+    const shouldEnter = enabled ?? !this.state.fullscreen;
     if (shouldEnter && !document.fullscreenElement) {
       await this.root.requestFullscreen?.();
       this.updateState({ fullscreen: true });
       return;
     }
 
-    if (!shouldEnter && document.fullscreenElement) {
+    if (!shouldEnter && document.fullscreenElement === this.root) {
       await document.exitFullscreen?.();
       this.updateState({ fullscreen: false });
     }
   }
+
+  private handleFullscreenChange = (): void => {
+    this.updateState({ fullscreen: document.fullscreenElement === this.root });
+  };
 
   private async download(filename?: string): Promise<void> {
     if (!this.file) {

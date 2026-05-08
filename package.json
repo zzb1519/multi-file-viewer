@@ -13,6 +13,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "exports": {
@@ -70,6 +71,7 @@
   },
   "dependencies": {
     "dompurify": "^3.4.2",
+    "lucide": "^1.14.0",
     "mammoth": "^1.8.0",
     "marked": "^12.0.2",
     "pdfjs-dist": "^4.10.38",
