@@ -1,6 +1,6 @@
 {
   "name": "multi-file-viewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A clean, extensible multi-format file preview library for React and Vue with native PDF, Excel, Word, Markdown, code, media, and text renderers.",
   "type": "module",
   "main": "./dist/index.cjs",
