@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.2 - 2026-05-15
+
+### Changed
+
+- Disabled the print toolbar button by default.
+- Set `printable` default to `false`; enable printing explicitly with `printable: true` and `toolbar.print: true`.
+- Updated README and README.zh-CN with print enablement examples.
+
+## 0.1.1 - 2026-05-15
+
+### Changed
+
+- Made the root entry framework-neutral. React components must be imported from `multi-file-viewer/react`, Vue components from `multi-file-viewer/vue`, and vanilla/core APIs from `multi-file-viewer`.
+- Added package metadata for the GitHub repository: `https://github.com/zzb1519/multi-file-viewer`.
+- Reworked documentation with an English default README and a separate Chinese README.
+- Added npm and yarn installation examples.
+
+### Added
+
+- Added internationalization support through `language` and `locale`.
+- Added built-in locale presets for `zh-CN`, `en-US`, and `en`.
+- Added documentation for framework-specific import paths to avoid React projects resolving Vue and Vue projects resolving React.
+
 ## 0.1.0 - 2026-05-08
 
 ### Added

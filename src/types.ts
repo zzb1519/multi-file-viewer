@@ -11,6 +11,8 @@ export type FileKind =
   | 'html'
   | 'unknown';
 
+export type LocaleName = 'zh-CN' | 'en-US' | 'en';
+
 export type FileSource = string | File | Blob | ArrayBuffer | Uint8Array;
 
 export interface ViewerFile {
@@ -96,7 +98,8 @@ export interface MultiFileViewerOptions {
   height?: string | number;
   theme?: ViewerTheme;
   toolbar?: boolean | ToolbarConfig;
-  locale?: ViewerLocale;
+  language?: LocaleName;
+  locale?: LocaleName | ViewerLocale;
   initialZoom?: number;
   minZoom?: number;
   maxZoom?: number;
@@ -197,6 +200,7 @@ export type RequiredViewerOptions = Omit<
   | 'style'
   | 'theme'
   | 'toolbar'
+  | 'language'
   | 'locale'
   | 'excel'
   | 'pdf'
@@ -216,6 +220,7 @@ export type RequiredViewerOptions = Omit<
   style?: Record<string, string | number>;
   theme: ResolvedViewerTheme;
   toolbar: ResolvedToolbarConfig;
+  language?: LocaleName;
   locale: ResolvedViewerLocale;
   excel: ResolvedExcelOptions;
   pdf: ResolvedPdfOptions;

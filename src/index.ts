@@ -1,9 +1,6 @@
 import './style.css';
 
 export { createViewer, MultiFileViewer } from './core';
-export { MultiFileViewerReact } from './react';
-export type { MultiFileViewerReactProps, MultiFileViewerReactRef } from './react';
-export { MultiFileViewerVue } from './vue';
 export { nativeRenderers } from './renderers';
 export {
   pdfRenderer,
@@ -24,6 +21,7 @@ export type {
   FileKind,
   FileSource,
   LoadedFile,
+  LocaleName,
   MultiFileViewerOptions,
   NormalizedFile,
   PdfOptions,

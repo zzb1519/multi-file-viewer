@@ -75,6 +75,7 @@ export type {
   ExcelOptions,
   FileKind,
   FileSource,
+  LocaleName,
   MultiFileViewerOptions,
   PdfOptions,
   ToolbarConfig,

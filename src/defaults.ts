@@ -1,4 +1,4 @@
-import type { MultiFileViewerOptions, RequiredViewerOptions, ToolbarConfig, ViewerLocale, ViewerTheme } from './types';
+import type { LocaleName, MultiFileViewerOptions, RequiredViewerOptions, ToolbarConfig, ViewerLocale, ViewerTheme } from './types';
 
 export const defaultLocale: Required<ViewerLocale> = {
   loading: 'Loading preview...',
@@ -34,12 +34,18 @@ export const zhCNLocale: Required<ViewerLocale> = {
   error: '\u9884\u89c8\u5931\u8d25'
 };
 
+const localeMap: Record<LocaleName, Required<ViewerLocale>> = {
+  'en-US': defaultLocale,
+  en: defaultLocale,
+  'zh-CN': zhCNLocale
+};
+
 export const defaultToolbar: Required<ToolbarConfig> = {
   visible: true,
   zoom: true,
   rotate: true,
   download: true,
-  print: true,
+  print: false,
   fullscreen: true,
   fitWidth: true,
   reset: true
@@ -58,9 +64,11 @@ export const defaultTheme: Required<ViewerTheme> = {
 };
 
 export function resolveOptions(options: MultiFileViewerOptions = {}): RequiredViewerOptions {
+  const language = resolveLanguage(options.language, options.locale);
+  const customLocale = typeof options.locale === 'object' ? options.locale : undefined;
   const locale = {
-    ...zhCNLocale,
-    ...options.locale
+    ...localeMap[language],
+    ...customLocale
   };
   const toolbar = typeof options.toolbar === 'boolean'
     ? { ...defaultToolbar, visible: options.toolbar }
@@ -79,13 +87,14 @@ export function resolveOptions(options: MultiFileViewerOptions = {}): RequiredVi
       ...options.theme
     },
     toolbar,
+    language,
     locale,
     initialZoom: options.initialZoom ?? 1,
     minZoom: options.minZoom ?? 0.25,
     maxZoom: options.maxZoom ?? 4,
     zoomStep: options.zoomStep ?? 0.15,
     downloadable: options.downloadable ?? true,
-    printable: options.printable ?? true,
+    printable: options.printable ?? false,
     excel: {
       sheetName: options.excel?.sheetName,
       maxRows: options.excel?.maxRows ?? 10000,
@@ -123,4 +132,14 @@ export function resolveOptions(options: MultiFileViewerOptions = {}): RequiredVi
     onRotateChange: options.onRotateChange,
     onSheetChange: options.onSheetChange
   };
+}
+
+function resolveLanguage(language?: LocaleName, locale?: MultiFileViewerOptions['locale']): LocaleName {
+  if (typeof locale === 'string') {
+    return locale;
+  }
+  if (language) {
+    return language;
+  }
+  return 'zh-CN';
 }

@@ -80,10 +80,8 @@ export class MultiFileViewer {
         ...this.options.theme,
         ...options.theme
       },
-      locale: {
-        ...this.options.locale,
-        ...options.locale
-      },
+      language: options.language ?? this.options.language,
+      locale: mergeLocale(this.options.locale, options.locale),
       excel: {
         ...this.options.excel,
         ...options.excel
@@ -466,6 +464,19 @@ function mergeToolbar(previous: RequiredViewerOptions['toolbar'], next: MultiFil
     return previous;
   }
   if (typeof next === 'boolean') {
+    return next;
+  }
+  return {
+    ...previous,
+    ...next
+  };
+}
+
+function mergeLocale(previous: RequiredViewerOptions['locale'], next: MultiFileViewerOptions['locale']): MultiFileViewerOptions['locale'] {
+  if (next === undefined) {
+    return previous;
+  }
+  if (typeof next === 'string') {
     return next;
   }
   return {
