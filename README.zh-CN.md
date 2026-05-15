@@ -35,6 +35,32 @@ yarn add multi-file-viewer
 
 不要从根入口导入 `MultiFileViewerReact` 或 `MultiFileViewerVue`。根入口现在刻意保持框架无关，避免 React 项目因为误用根入口而解析 Vue。
 
+## TypeScript 模块解析
+
+`multi-file-viewer` 会为 `multi-file-viewer/react` 和 `multi-file-viewer/vue` 发布子路径类型声明。`0.1.3` 起也补充了 `typesVersions` 兜底，兼容仍在使用旧版 `node` 模块解析的项目。
+
+对于 Vite、React、Vue 等现代打包项目，仍然推荐在引用项目的 `tsconfig.json` 中使用：
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "module": "ESNext"
+  }
+}
+```
+
+如果项目使用 Node 风格 ESM 解析，可以使用：
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "node16",
+    "module": "Node16"
+  }
+}
+```
+
 ## React 使用
 
 ```tsx

@@ -38,6 +38,32 @@ Use the framework-specific subpath in framework projects.
 
 Do not import `MultiFileViewerReact` or `MultiFileViewerVue` from the root package. The root package is intentionally framework-neutral.
 
+## TypeScript Module Resolution
+
+`multi-file-viewer` publishes subpath declarations for `multi-file-viewer/react` and `multi-file-viewer/vue`. Version `0.1.3` also includes `typesVersions` fallbacks for projects that still use the classic `node` module resolution.
+
+For Vite, React, Vue, and other modern bundler projects, this TypeScript setting is still recommended:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "module": "ESNext"
+  }
+}
+```
+
+If your project uses Node-style ESM resolution, use:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "node16",
+    "module": "Node16"
+  }
+}
+```
+
 ## React Usage
 
 ```tsx

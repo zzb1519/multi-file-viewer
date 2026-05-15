@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.3 - 2026-05-15
+
+### Changed
+
+- Added `typesVersions` fallbacks for `multi-file-viewer/react`, `multi-file-viewer/vue`, and `multi-file-viewer/style.css`.
+- Improved compatibility for projects still using older TypeScript `moduleResolution` settings.
+- Documented recommended TypeScript module resolution settings in English and Chinese READMEs.
+
 ## 0.1.2 - 2026-05-15
 
 ### Changed
@@ -9,11 +17,6 @@ All notable changes to this project will be documented in this file.
 - Disabled the print toolbar button by default.
 - Set `printable` default to `false`; enable printing explicitly with `printable: true` and `toolbar.print: true`.
 - Updated README and README.zh-CN with print enablement examples.
-
-## 0.1.1 - 2026-05-15
-
-### Changed
-
 - Made the root entry framework-neutral. React components must be imported from `multi-file-viewer/react`, Vue components from `multi-file-viewer/vue`, and vanilla/core APIs from `multi-file-viewer`.
 - Added package metadata for the GitHub repository: `https://github.com/zzb1519/multi-file-viewer`.
 - Reworked documentation with an English default README and a separate Chinese README.
