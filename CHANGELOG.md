@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.5 - 2026-05-19
+
+### Fixed
+
+- Stabilized the toolbar title area so narrow toolbars no longer push or cover the file name.
+- Added native title tooltip support for long file names in the toolbar.
+- Adjusted Excel preview sizing so internal scrollbars no longer consume table width or height.
+- Let Excel use the outer viewport for natural-size overflow while keeping hidden internal scrollbars for sticky headers.
+
 ## 0.1.4 - 2026-05-19
 
 ### Added

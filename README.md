@@ -8,10 +8,10 @@
 - React, Vue 3, and vanilla JavaScript adapters.
 - Framework-safe entry points: React projects do not need Vue, and Vue projects do not need React.
 - Native PDF, Excel/CSV/TSV, Word `.docx`, Markdown, code, text, HTML, image, video, and audio preview.
-- Toolbar with Lucide icons: zoom, fit width, rotate, reset, download, fullscreen, and exit fullscreen. Narrow toolbars collapse extra actions into a more menu. 
+- Toolbar with Lucide icons: zoom, fit width, rotate, reset, download, fullscreen, and exit fullscreen. Narrow toolbars keep a stable title area and collapse extra actions into a more menu.
 - Internationalization support. The default UI language is Chinese; English can be enabled with `locale: 'en-US'`.
 - Layout strategy support: natural file size by default, optional width-fit or contain-fit rendering.
-- Excel-like preview with bottom sheet tabs, sticky headers, auto-fit columns, wrapped text, manual column width resizing, manual row height resizing, and partial cell style mapping.
+- Excel-like preview with bottom sheet tabs, sticky headers, auto-fit columns, wrapped text, manual column width resizing, manual row height resizing, hidden internal scrollbars, and partial cell style mapping.
 - Remote URL loading options for headers, CORS mode, credentials, cache, referrer policy, and cross-origin behavior.
 - Detailed inline error output when file loading or rendering fails.
 - Custom theme, CSS overrides, and custom renderer extension.

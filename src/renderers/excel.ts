@@ -61,11 +61,18 @@ function renderWorkbook(
   const sheetView = buildSheetView(workbook.Sheets[activeSheet], context);
   const table = renderSheetTable(workbook.Sheets[activeSheet], sheetView, context);
   table.style.fontSize = `${13 * context.state.zoom}px`;
+  if (context.options.layout.fit === 'natural') {
+    shell.style.width = `${getSheetWidth(sheetView)}px`;
+  }
 
   scroller.appendChild(table);
   gridWrap.appendChild(scroller);
   shell.append(gridWrap, renderSheetTabs(workbook.SheetNames, activeSheet, context));
   container.appendChild(shell);
+}
+
+function getSheetWidth(view: SheetView): number {
+  return ROW_HEADER_WIDTH + view.columnWidths.reduce((sum, width) => sum + width, 0);
 }
 
 function renderSheetTabs(sheetNames: string[], activeSheet: string, context: RendererContext): HTMLElement {

@@ -264,9 +264,16 @@ export class MultiFileViewer {
       return;
     }
 
-    const left = createElement('div', { className: 'mfv-toolbar-group' });
+    const left = createElement('div', { className: 'mfv-toolbar-group mfv-toolbar-title' });
     const right = createElement('div', { className: 'mfv-toolbar-group mfv-toolbar-actions' });
-    const filename = createElement('div', { className: 'mfv-file-name', text: this.file?.name ?? this.options.filename ?? '' });
+    const fileNameText = this.file?.name ?? this.options.filename ?? '';
+    const filename = createElement('div', {
+      className: 'mfv-file-name',
+      text: fileNameText,
+      attrs: {
+        title: fileNameText
+      }
+    });
     left.appendChild(filename);
 
     if (toolbar.zoom) {

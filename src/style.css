@@ -56,9 +56,15 @@
   min-width: 0;
 }
 
+.mfv-toolbar-title {
+  flex: 0 0 clamp(120px, 34%, 320px);
+  width: clamp(120px, 34%, 320px);
+}
+
 .mfv-toolbar-actions {
   position: relative;
-  flex: 0 1 auto;
+  flex: 1 1 0;
+  min-width: 44px;
   justify-content: flex-end;
   overflow: visible;
 }
@@ -72,7 +78,8 @@
 
 .mfv-file-name {
   min-width: 0;
-  max-width: 42vw;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -414,6 +421,7 @@
 .mfv-excel {
   display: flex;
   flex-direction: column;
+  width: max-content;
   min-width: 100%;
   min-height: 100%;
   height: 100%;
@@ -427,6 +435,7 @@
 .mfv-root[data-layout-fit="width"] .mfv-excel,
 .mfv-root[data-layout-fit="contain"] .mfv-excel {
   width: 100%;
+  max-width: 100%;
 }
 
 .mfv-excel-grid-wrap {
@@ -485,7 +494,14 @@
   width: 100%;
   height: 100%;
   overflow: auto;
+  overflow: overlay;
+  scrollbar-width: none;
   background: #ffffff;
+}
+
+.mfv-excel-scroller::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .mfv-excel-table {
@@ -681,6 +697,11 @@
   .mfv-toolbar-group {
     width: 100%;
     padding-bottom: 2px;
+  }
+
+  .mfv-toolbar-title {
+    flex-basis: auto;
+    width: 100%;
   }
 
   .mfv-toolbar-actions {
