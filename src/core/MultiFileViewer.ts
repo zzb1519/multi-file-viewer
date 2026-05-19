@@ -22,6 +22,7 @@ export class MultiFileViewer {
   private readonly toolbar: HTMLElement;
   private readonly viewport: HTMLElement;
   private readonly content: HTMLElement;
+  private toolbarResizeObserver?: ResizeObserver;
   private options: RequiredViewerOptions;
   private file?: LoadedFile;
   private renderer?: ViewerRenderer;
@@ -46,6 +47,7 @@ export class MultiFileViewer {
     this.root.append(this.toolbar, this.viewport);
     element.appendChild(this.root);
     document.addEventListener('fullscreenchange', this.handleFullscreenChange);
+    document.addEventListener('click', this.handleDocumentClick);
 
     this.state = {
       kind: this.options.type ?? 'unknown',
@@ -57,6 +59,12 @@ export class MultiFileViewer {
 
     this.api = this.createApi();
     this.applyRootOptions();
+    if (typeof ResizeObserver !== 'undefined') {
+      this.toolbarResizeObserver = new ResizeObserver(() => {
+        this.updateToolbarOverflow();
+      });
+      this.toolbarResizeObserver.observe(this.toolbar);
+    }
     this.renderToolbar();
     this.options.onReady?.(this.api);
 
@@ -79,6 +87,10 @@ export class MultiFileViewer {
       theme: {
         ...this.options.theme,
         ...options.theme
+      },
+      layout: {
+        ...this.options.layout,
+        ...options.layout
       },
       language: options.language ?? this.options.language,
       locale: mergeLocale(this.options.locale, options.locale),
@@ -120,7 +132,9 @@ export class MultiFileViewer {
     this.destroyed = true;
     this.renderer?.destroy?.();
     releaseLoadedFile(this.file);
+    this.toolbarResizeObserver?.disconnect();
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+    document.removeEventListener('click', this.handleDocumentClick);
     this.root.remove();
   }
 
@@ -251,14 +265,18 @@ export class MultiFileViewer {
     }
 
     const left = createElement('div', { className: 'mfv-toolbar-group' });
-    const right = createElement('div', { className: 'mfv-toolbar-group' });
+    const right = createElement('div', { className: 'mfv-toolbar-group mfv-toolbar-actions' });
     const filename = createElement('div', { className: 'mfv-file-name', text: this.file?.name ?? this.options.filename ?? '' });
     left.appendChild(filename);
 
     if (toolbar.zoom) {
-      right.appendChild(this.bindButton('zoomOut', this.options.locale.zoomOut, () => this.api.zoomOut()));
-      right.appendChild(createElement('span', { className: 'mfv-zoom-value', text: `${Math.round(this.state.zoom * 100)}%` }));
-      right.appendChild(this.bindButton('zoomIn', this.options.locale.zoomIn, () => this.api.zoomIn()));
+      const zoomGroup = createElement('div', { className: 'mfv-toolbar-control mfv-toolbar-zoom' });
+      zoomGroup.append(
+        this.bindButton('zoomOut', this.options.locale.zoomOut, () => this.api.zoomOut()),
+        createElement('span', { className: 'mfv-zoom-value', text: `${Math.round(this.state.zoom * 100)}%` }),
+        this.bindButton('zoomIn', this.options.locale.zoomIn, () => this.api.zoomIn())
+      );
+      right.appendChild(zoomGroup);
     }
     if (toolbar.fitWidth) {
       right.appendChild(this.bindButton('fitWidth', this.options.locale.fitWidth, () => this.api.fitWidth()));
@@ -282,12 +300,71 @@ export class MultiFileViewer {
     }
 
     this.toolbar.append(left, right);
+    requestAnimationFrame(() => {
+      this.updateToolbarOverflow();
+    });
   }
 
   private bindButton(icon: IconName, title: string, handler: () => void): HTMLButtonElement {
     const button = makeButton(renderIcon(icon), title, 'mfv-toolbar-button mfv-icon-button', true);
     button.addEventListener('click', handler);
     return button;
+  }
+
+  private updateToolbarOverflow(): void {
+    if (!this.options.toolbar.visible || !this.toolbar.isConnected) {
+      return;
+    }
+
+    const right = this.toolbar.querySelector<HTMLElement>('.mfv-toolbar-actions');
+    if (!right) {
+      return;
+    }
+
+    const existingOverflow = right.querySelector<HTMLElement>('.mfv-toolbar-overflow');
+    if (existingOverflow) {
+      const menu = existingOverflow.querySelector<HTMLElement>('.mfv-toolbar-menu');
+      Array.from(menu?.children ?? []).forEach((child) => {
+        if (child instanceof HTMLElement) {
+          child.classList.remove('mfv-toolbar-menu-item');
+        }
+        right.insertBefore(child, existingOverflow);
+      });
+      existingOverflow.remove();
+    }
+
+    const actions = Array.from(right.children).filter((child): child is HTMLElement => child instanceof HTMLElement);
+    if (actions.length <= 1 || right.scrollWidth <= right.clientWidth + 1) {
+      return;
+    }
+
+    const overflow = createElement('div', { className: 'mfv-toolbar-overflow' });
+    const menu = createElement('div', {
+      className: 'mfv-toolbar-menu',
+      attrs: {
+        role: 'menu'
+      }
+    });
+    const trigger = this.bindButton('more', this.options.locale.more, () => {
+      overflow.classList.toggle('is-open');
+    });
+    trigger.classList.add('mfv-toolbar-more');
+    overflow.append(trigger, menu);
+    right.appendChild(overflow);
+
+    while (right.scrollWidth > right.clientWidth + 1) {
+      const candidates = Array.from(right.children).filter((child): child is HTMLElement => child instanceof HTMLElement && child !== overflow);
+      const candidate = candidates[candidates.length - 1];
+      if (!candidate) {
+        break;
+      }
+      candidate.classList.add('mfv-toolbar-menu-item');
+      menu.insertBefore(candidate, menu.firstChild);
+    }
+
+    if (!menu.firstChild) {
+      overflow.remove();
+    }
   }
 
   private renderLoading(): void {
@@ -373,6 +450,13 @@ export class MultiFileViewer {
     this.updateState({ fullscreen: document.fullscreenElement === this.root });
   };
 
+  private handleDocumentClick = (event: MouseEvent): void => {
+    if (this.toolbar.contains(event.target as Node)) {
+      return;
+    }
+    this.toolbar.querySelector<HTMLElement>('.mfv-toolbar-overflow.is-open')?.classList.remove('is-open');
+  };
+
   private async download(filename?: string): Promise<void> {
     if (!this.file) {
       return;
@@ -436,10 +520,14 @@ export class MultiFileViewer {
 
   private applyRootOptions(): void {
     const theme = this.options.theme;
+    const layout = this.options.layout;
     this.root.className = `${ROOT_CLASS} ${this.options.className}`.trim();
+    this.root.dataset.layoutFit = layout.fit;
     setStyles(this.root, {
       width: formatSize(this.options.width),
       height: formatSize(this.options.height),
+      '--mfv-content-padding': formatSize(layout.contentPadding),
+      '--mfv-document-max-width': formatSize(layout.documentMaxWidth),
       '--mfv-background': theme.background,
       '--mfv-surface': theme.surface,
       '--mfv-border': theme.border,

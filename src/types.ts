@@ -71,6 +71,14 @@ export interface WordOptions {
   includeDefaultStyleMap?: boolean;
 }
 
+export type ViewerLayoutFit = 'natural' | 'width' | 'contain';
+
+export interface ViewerLayoutOptions {
+  fit?: ViewerLayoutFit;
+  documentMaxWidth?: string | number;
+  contentPadding?: string | number;
+}
+
 export interface ViewerLocale {
   loading?: string;
   unsupported?: string;
@@ -83,6 +91,7 @@ export interface ViewerLocale {
   exitFullscreen?: string;
   fitWidth?: string;
   reset?: string;
+  more?: string;
   sheet?: string;
   page?: string;
   error?: string;
@@ -96,6 +105,7 @@ export interface MultiFileViewerOptions {
   style?: Record<string, string | number>;
   width?: string | number;
   height?: string | number;
+  layout?: ViewerLayoutOptions;
   theme?: ViewerTheme;
   toolbar?: boolean | ToolbarConfig;
   language?: LocaleName;
@@ -191,6 +201,7 @@ export type ResolvedExcelOptions = Required<Omit<ExcelOptions, 'sheetName'>> & P
 export type ResolvedPdfOptions = Required<PdfOptions>;
 export type ResolvedCodeOptions = Required<Omit<CodeOptions, 'language'>> & Pick<CodeOptions, 'language'>;
 export type ResolvedWordOptions = Required<WordOptions>;
+export type ResolvedViewerLayoutOptions = Required<ViewerLayoutOptions>;
 
 export type RequiredViewerOptions = Omit<
   Required<MultiFileViewerOptions>,
@@ -198,6 +209,7 @@ export type RequiredViewerOptions = Omit<
   | 'filename'
   | 'type'
   | 'style'
+  | 'layout'
   | 'theme'
   | 'toolbar'
   | 'language'
@@ -218,6 +230,7 @@ export type RequiredViewerOptions = Omit<
   filename?: string;
   type?: FileKind;
   style?: Record<string, string | number>;
+  layout: ResolvedViewerLayoutOptions;
   theme: ResolvedViewerTheme;
   toolbar: ResolvedToolbarConfig;
   language?: LocaleName;

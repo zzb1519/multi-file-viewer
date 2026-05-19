@@ -1,5 +1,5 @@
 import { createElement } from '../utils/dom';
-import type { ViewerRenderer } from '../types';
+import type { RendererContext, ViewerRenderer } from '../types';
 
 export const pdfRenderer: ViewerRenderer = {
   kind: 'pdf',
@@ -16,11 +16,17 @@ export const pdfRenderer: ViewerRenderer = {
     const wrapper = createElement('div', { className: 'mfv-pdf' });
     wrapper.style.gap = `${context.options.pdf.pageGap}px`;
     container.appendChild(wrapper);
+    const basePage = await pdf.getPage(1);
+    const baseViewport = basePage.getViewport({
+      scale: 1,
+      rotation: context.state.rotate
+    });
+    const layoutScale = resolveLayoutScale(container, context, baseViewport.width, baseViewport.height);
 
     for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-      const page = await pdf.getPage(pageNumber);
+      const page = pageNumber === 1 ? basePage : await pdf.getPage(pageNumber);
       const viewport = page.getViewport({
-        scale: context.state.zoom,
+        scale: context.state.zoom * layoutScale,
         rotation: context.state.rotate
       });
       const pageFrame = createElement('div', {
@@ -51,3 +57,28 @@ export const pdfRenderer: ViewerRenderer = {
     }
   }
 };
+
+function resolveLayoutScale(container: HTMLElement, context: RendererContext, width: number, height: number): number {
+  const fit = context.options.layout.fit;
+  if (fit === 'natural') {
+    return 1;
+  }
+
+  const padding = parseSize(context.options.layout.contentPadding);
+  const availableWidth = Math.max(1, container.clientWidth - padding * 2);
+  const widthScale = availableWidth / width;
+  if (fit === 'width') {
+    return widthScale;
+  }
+
+  const availableHeight = Math.max(1, container.clientHeight - padding * 2);
+  return Math.min(widthScale, availableHeight / height);
+}
+
+function parseSize(value: string | number): number {
+  if (typeof value === 'number') {
+    return value;
+  }
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}

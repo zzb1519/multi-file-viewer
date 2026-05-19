@@ -53,6 +53,10 @@ const CODE_EXTENSIONS = new Set([
   'jsx',
   'ts',
   'tsx',
+  'mts',
+  'cts',
+  'mjs',
+  'cjs',
   'json',
   'css',
   'scss',
@@ -112,6 +116,14 @@ export function inferKind(name?: string, mimeType?: string, explicit?: FileKind)
     return explicit;
   }
 
+  const extension = getExtension(name);
+  if (CODE_EXTENSIONS.has(extension)) {
+    return 'code';
+  }
+  if (EXTENSION_KIND_MAP[extension]) {
+    return EXTENSION_KIND_MAP[extension];
+  }
+
   const normalizedMime = mimeType?.split(';')[0]?.trim().toLowerCase();
   if (normalizedMime) {
     if (MIME_KIND_MAP[normalizedMime]) {
@@ -128,12 +140,7 @@ export function inferKind(name?: string, mimeType?: string, explicit?: FileKind)
     }
   }
 
-  const extension = getExtension(name);
-  if (CODE_EXTENSIONS.has(extension)) {
-    return 'code';
-  }
-
-  return EXTENSION_KIND_MAP[extension] ?? 'unknown';
+  return 'unknown';
 }
 
 export function normalizeFile(input: ViewerFile | FileSource, fallback?: { filename?: string; type?: FileKind }): NormalizedFile {

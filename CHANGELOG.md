@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.4 - 2026-05-19
+
+### Added
+
+- Added `layout.fit` with `natural`, `width`, and `contain` strategies.
+- Added `layout.documentMaxWidth` and `layout.contentPadding` for document width and preview padding control.
+- Added responsive toolbar overflow handling. Extra toolbar actions collapse into a more menu when the toolbar is too narrow.
+
+### Fixed
+
+- Fixed `.ts`, `.tsx`, `.mts`, `.cts`, `.mjs`, and `.cjs` file detection so code files are not misclassified by server MIME types such as media content types.
+
 ## 0.1.3 - 2026-05-15
 
 ### Changed

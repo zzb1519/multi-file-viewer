@@ -1,6 +1,7 @@
 import {
   Download,
   Maximize,
+  MoreHorizontal,
   Minimize,
   Printer,
   RefreshCw,
@@ -11,7 +12,7 @@ import {
   type IconNode
 } from 'lucide';
 
-export type IconName = 'zoomIn' | 'zoomOut' | 'fitWidth' | 'rotate' | 'reset' | 'print' | 'download' | 'fullscreen' | 'exitFullscreen';
+export type IconName = 'zoomIn' | 'zoomOut' | 'fitWidth' | 'rotate' | 'reset' | 'print' | 'download' | 'fullscreen' | 'exitFullscreen' | 'more';
 
 const ICONS: Record<IconName, IconNode> = {
   zoomIn: ZoomIn,
@@ -22,7 +23,8 @@ const ICONS: Record<IconName, IconNode> = {
   print: Printer,
   download: Download,
   fullscreen: Maximize,
-  exitFullscreen: Minimize
+  exitFullscreen: Minimize,
+  more: MoreHorizontal
 };
 
 export function renderIcon(name: IconName): string {

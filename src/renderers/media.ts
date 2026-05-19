@@ -22,7 +22,7 @@ export const imageRenderer: ViewerRenderer = {
 
 export const videoRenderer: ViewerRenderer = {
   kind: 'video',
-  render(container, { file }) {
+  render(container, { file, options }) {
     const video = createElement('video', {
       className: 'mfv-video',
       attrs: {
@@ -30,6 +30,9 @@ export const videoRenderer: ViewerRenderer = {
         controls: 'true'
       }
     });
+    if (options.layout.fit === 'contain') {
+      video.classList.add('mfv-media-contain');
+    }
     container.appendChild(video);
   }
 };
@@ -53,7 +56,7 @@ export const audioRenderer: ViewerRenderer = {
 
 export const htmlRenderer: ViewerRenderer = {
   kind: 'html',
-  render(container, { file }) {
+  render(container, { file, options }) {
     const iframe = createElement('iframe', {
       className: 'mfv-html',
       attrs: {
@@ -61,6 +64,9 @@ export const htmlRenderer: ViewerRenderer = {
         title: file.name
       }
     });
+    if (options.layout.fit === 'contain') {
+      iframe.classList.add('mfv-media-contain');
+    }
 
     if (file.url) {
       iframe.src = file.url;

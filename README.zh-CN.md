@@ -8,8 +8,9 @@
 - 支持 React、Vue 3、原生 JS 调用。
 - 框架安全的子路径入口：React 项目不需要安装/解析 Vue，Vue 项目不需要安装/解析 React。
 - 内置 PDF、Excel/CSV/TSV、Word `.docx`、Markdown、代码、纯文本、HTML、图片、音视频预览。
-- 工具栏使用 Lucide 图标：放大、缩小、适应宽度、旋转、重置、下载、全屏/退出全屏。打印能力保留，但默认关闭。
+- 工具栏使用 Lucide 图标：放大、缩小、适应宽度、旋转、重置、下载、全屏/退出全屏。宽度不足时会把剩余按钮收纳到更多菜单。
 - 支持国际化，默认中文；可通过 `locale: 'en-US'` 切换英文，也可传对象覆盖按钮 tooltip。
+- 支持布局策略：默认按文件自然尺寸显示，也可选择适应宽度或完整包含在容器内。
 - Excel 支持底部工作表切换、内容自适应列宽、自动换行、手动拖拽列宽/行高、最大行列限制。
 - 支持远程链接加载配置：headers、CORS mode、credentials、cache、referrerPolicy。
 - 加载或渲染失败时会展示具体错误内容。
@@ -184,6 +185,31 @@ createViewer('#viewer', {
 | 图片 | `.jpg` `.png` `.gif` `.webp` `.svg` `.bmp` `.tiff` 等 |
 | 音视频 | `.mp4` `.webm` `.mov` `.mp3` `.wav` 等 |
 
+## 布局策略
+
+`width` 和 `height` 控制 viewer 外层容器尺寸。文件内容默认按自身自然尺寸显示，内容过大时滚动，内容较小时保持居中或阅读宽度。
+
+```ts
+createViewer('#viewer', {
+  file: '/files/manual.pdf',
+  width: '100%',
+  height: 720,
+  layout: {
+    fit: 'natural',
+    documentMaxWidth: 960,
+    contentPadding: 16
+  }
+});
+```
+
+需要让内容适配容器时，可以使用 `layout.fit`：
+
+| 值 | 说明 |
+| --- | --- |
+| `'natural'` | 默认值，保留文件/内容自然尺寸，必要时滚动。 |
+| `'width'` | Word、Markdown、代码、PDF 等尽量适应可用宽度。 |
+| `'contain'` | 图片、视频、HTML、PDF 等尽量完整包含在可用宽高内。 |
+
 ## 配置总览
 
 ```ts
@@ -195,6 +221,7 @@ type MultiFileViewerOptions = {
   style?: Record<string, string | number>;
   width?: string | number;
   height?: string | number;
+  layout?: ViewerLayoutOptions;
   theme?: ViewerTheme;
   toolbar?: boolean | ToolbarConfig;
   language?: 'zh-CN' | 'en-US' | 'en';
@@ -226,6 +253,14 @@ type MultiFileViewerOptions = {
 };
 ```
 
+### ViewerLayoutOptions
+
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `fit` | `'natural' \| 'width' \| 'contain'` | `'natural'` | 内容尺寸策略。 |
+| `documentMaxWidth` | `string \| number` | `960` | natural 模式下 Word、Markdown、文本和代码的最大阅读宽度。 |
+| `contentPadding` | `string \| number` | `16` | 文件显示区内边距。 |
+
 ### ToolbarConfig
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -254,6 +289,7 @@ type MultiFileViewerOptions = {
 | `exitFullscreen` | `退出全屏` | 退出全屏 tooltip。 |
 | `fitWidth` | `适应宽度` | 适应宽度按钮 tooltip。 |
 | `reset` | `重置` | 重置按钮 tooltip。 |
+| `more` | `更多操作` | 工具栏更多菜单 tooltip。 |
 | `sheet` | `工作表` | Excel sheet 标签 title 前缀。 |
 | `page` | `页` | 页码文案。 |
 | `error` | `预览失败` | 错误标题。 |

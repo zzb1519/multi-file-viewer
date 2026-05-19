@@ -1,4 +1,4 @@
-import type { LocaleName, MultiFileViewerOptions, RequiredViewerOptions, ToolbarConfig, ViewerLocale, ViewerTheme } from './types';
+import type { LocaleName, MultiFileViewerOptions, RequiredViewerOptions, ToolbarConfig, ViewerLayoutOptions, ViewerLocale, ViewerTheme } from './types';
 
 export const defaultLocale: Required<ViewerLocale> = {
   loading: 'Loading preview...',
@@ -12,6 +12,7 @@ export const defaultLocale: Required<ViewerLocale> = {
   exitFullscreen: 'Exit fullscreen',
   fitWidth: 'Fit width',
   reset: 'Reset',
+  more: 'More actions',
   sheet: 'Sheet',
   page: 'Page',
   error: 'Preview failed'
@@ -29,6 +30,7 @@ export const zhCNLocale: Required<ViewerLocale> = {
   exitFullscreen: '\u9000\u51fa\u5168\u5c4f',
   fitWidth: '\u9002\u5e94\u5bbd\u5ea6',
   reset: '\u91cd\u7f6e',
+  more: '\u66f4\u591a\u64cd\u4f5c',
   sheet: '\u5de5\u4f5c\u8868',
   page: '\u9875',
   error: '\u9884\u89c8\u5931\u8d25'
@@ -63,6 +65,12 @@ export const defaultTheme: Required<ViewerTheme> = {
   accent: '#eef3ff'
 };
 
+export const defaultLayout: Required<ViewerLayoutOptions> = {
+  fit: 'natural',
+  documentMaxWidth: 960,
+  contentPadding: 16
+};
+
 export function resolveOptions(options: MultiFileViewerOptions = {}): RequiredViewerOptions {
   const language = resolveLanguage(options.language, options.locale);
   const customLocale = typeof options.locale === 'object' ? options.locale : undefined;
@@ -82,6 +90,10 @@ export function resolveOptions(options: MultiFileViewerOptions = {}): RequiredVi
     style: options.style,
     width: options.width ?? '100%',
     height: options.height ?? 640,
+    layout: {
+      ...defaultLayout,
+      ...options.layout
+    },
     theme: {
       ...defaultTheme,
       ...options.theme

@@ -8,8 +8,9 @@
 - React, Vue 3, and vanilla JavaScript adapters.
 - Framework-safe entry points: React projects do not need Vue, and Vue projects do not need React.
 - Native PDF, Excel/CSV/TSV, Word `.docx`, Markdown, code, text, HTML, image, video, and audio preview.
-- Toolbar with Lucide icons: zoom, fit width, rotate, reset, download, fullscreen, and exit fullscreen. Print is available but disabled by default.
+- Toolbar with Lucide icons: zoom, fit width, rotate, reset, download, fullscreen, and exit fullscreen. Narrow toolbars collapse extra actions into a more menu. 
 - Internationalization support. The default UI language is Chinese; English can be enabled with `locale: 'en-US'`.
+- Layout strategy support: natural file size by default, optional width-fit or contain-fit rendering.
 - Excel-like preview with bottom sheet tabs, sticky headers, auto-fit columns, wrapped text, manual column width resizing, manual row height resizing, and partial cell style mapping.
 - Remote URL loading options for headers, CORS mode, credentials, cache, referrer policy, and cross-origin behavior.
 - Detailed inline error output when file loading or rendering fails.
@@ -204,6 +205,31 @@ createViewer('#viewer', {
 | Images | `.jpg` `.png` `.gif` `.webp` `.svg` `.bmp` `.tiff` and more |
 | Media | `.mp4` `.webm` `.mov` `.mp3` `.wav` and more |
 
+## Layout Strategy
+
+The viewer container size is controlled by `width` and `height`. The file content uses its natural size by default, so large files can scroll and smaller files can stay centered.
+
+```ts
+createViewer('#viewer', {
+  file: '/files/manual.pdf',
+  width: '100%',
+  height: 720,
+  layout: {
+    fit: 'natural',
+    documentMaxWidth: 960,
+    contentPadding: 16
+  }
+});
+```
+
+Use `layout.fit` when you want content to adapt to the container:
+
+| Value | Description |
+| --- | --- |
+| `'natural'` | Default. Keep file/content natural size and scroll when needed. |
+| `'width'` | Fit document-like content and PDFs to the available width. |
+| `'contain'` | Fit media-like content and PDFs inside the available width and height. |
+
 ## Options
 
 ```ts
@@ -215,6 +241,7 @@ type MultiFileViewerOptions = {
   style?: Record<string, string | number>;
   width?: string | number;
   height?: string | number;
+  layout?: ViewerLayoutOptions;
   theme?: ViewerTheme;
   toolbar?: boolean | ToolbarConfig;
   language?: 'zh-CN' | 'en-US' | 'en';
@@ -245,6 +272,14 @@ type MultiFileViewerOptions = {
   onSheetChange?: (sheetName: string) => void;
 };
 ```
+
+### ViewerLayoutOptions
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fit` | `'natural' \| 'width' \| 'contain'` | `'natural'` | Content sizing strategy. |
+| `documentMaxWidth` | `string \| number` | `960` | Max width for Word, Markdown, text, and code in natural mode. |
+| `contentPadding` | `string \| number` | `16` | Padding around the rendered file area. |
 
 ### ToolbarConfig
 
